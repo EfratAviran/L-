@@ -3,39 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מגזין לימור - מהדורת חוזקות</title>
+    <title>מגזין לימור - מהדורת יום הולדת</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- טעינת Framer Motion לאפקטים תלת ממדיים -->
     <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --magazine-purple: #803080;
-        }
+        :root { --magazine-purple: #803080; }
         body { 
             font-family: 'Assistant', sans-serif; 
             background-color: #f7f3f0; 
             color: #2d2d2d;
-            overflow-x: hidden;
             margin: 0;
+            overflow-x: hidden;
         }
         .serif-font { font-family: 'Playfair Display', serif; }
-        
-        /* הגדרת פרספקטיבה לאפקט התלת ממד */
-        .perspective-container {
-            perspective: 2000px;
-        }
-        
-        .magazine-card {
-            aspect-ratio: 9 / 16;
+        .perspective-container { perspective: 2000px; }
+        .magazine-card { 
+            aspect-ratio: 9 / 16; 
             transform-origin: right center;
+            background-color: white;
         }
-
         .paper-texture {
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .floating-icon {
+            animation: float 4s ease-in-out infinite;
         }
     </style>
 </head>
@@ -43,41 +43,53 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState } = React;
 
-        // הגדרות GitHub המעודכנות לפי התמונות שלך (שימוש ב-png)
         const GITHUB_USER = "EfratAviran"; 
         const GITHUB_REPO = "L-"; 
         const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/`;
 
+        // סידור הכרטיסים לפי סדר הופעה קבוע (card7 תופיע אחרונה לפני card8)
         const STRENGTHS = [
-            { id: 1, title: "נהריה זה הבית", tag: "שייכות", desc: "נהריה זה הלב. אהבה למקום, חיבור עמוק ואחריות לקהילה.", quote: "כאן נולדתי, כאן ביתי...", letter: "נ", img: "card1.png" },
-            { id: 2, title: "השבט", tag: "מורשת", desc: "החיים בחמולה במאה ה-21. משפחה מעל הכל, בית חם ומזמין.", quote: "ארוחת שבת, סירים וצחוק בבית אחד.", letter: "ה", img: "card2.png" },
-            { id: 3, title: "אתונה", tag: "אסטרטגיה", desc: "ניהול מלחמה בשלט רחוק, מפקחת מפוקחת עם חוסן ואמונה.", quote: "חשיבה יצירתית וראיית התמונה הרחבה.", letter: "א", img: "card3.png" },
-            { id: 4, title: "מלכת היעילות", tag: "ביצוע", desc: "ביצועיסטית ללא פשרות. תכנון קפדני וניצול זמן מושכל.", quote: "עשייה מהירה ואפקטיבית היא שם המשחק.", letter: "מ", img: "card4.png" },
-            { id: 5, title: "המגדלור המקצועי", tag: "סמכות", desc: "לימור אוגדן חוזרי מנכ\"ל. בקיאות מוחלטת בנהלים ובחוק.", quote: "מכירה כל סעיף, מפרשת כל הנחיה.", letter: "ה", img: "card5.png" },
-            { id: 6, title: "נוכחות וסטייל", tag: "אסתטיקה", desc: "ביטחון עצמי, סטייל ייחודי ונוכחות מרשימה בכל מקום.", quote: "משרה ביטחון ועוצמה בכל מצב ובכל מפגש.", letter: "ס", img: "card6.png" },
-            { id: 7, title: "לב גדול", tag: "אנושיות", desc: "שותפות ושיתופיות. זמינות תמידית ואוזן קשבת לכל אדם.", quote: "מחבקת כל אתגר באהבה וברגישות.", letter: "ל", img: "card7.png" }
+            { id: 1, img: "card1.png" },
+            { id: 2, img: "card2.png" },
+            { id: 3, img: "card3.png" },
+            { id: 4, img: "card4.png" },
+            { id: 5, img: "card5.png" },
+            { id: 6, img: "card6.png" },
+            { id: 7, img: "card7.png" } // הכרטיסייה "אנו מאחלים לך"
         ];
 
+        const BirthdayDecoration = () => (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
+                <svg className="absolute top-10 left-10 w-16 h-16 floating-icon" viewBox="0 0 24 24" fill="none" stroke="#803080" strokeWidth="1">
+                    <path d="M20 12l-8 8-8-8 8-8 8 8z" />
+                </svg>
+                <svg className="absolute top-20 right-10 w-12 h-12 floating-icon" style={{animationDelay: '1s'}} viewBox="0 0 24 24" fill="none" stroke="#803080" strokeWidth="1">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v8M8 12h8" />
+                </svg>
+                <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-[#803080] rounded-full animate-ping"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-3 h-3 border border-[#803080] rotate-45 animate-bounce"></div>
+                <svg className="absolute bottom-10 left-20 w-20 h-20 opacity-30" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="#803080" strokeWidth="0.5" fill="none" strokeDasharray="5,5" />
+                </svg>
+            </div>
+        );
+
         function App() {
-            // גישה לרכיבי Framer Motion
             const motion = window.Motion?.motion || window.FramerMotion?.motion || null;
             const AnimatePresence = window.Motion?.AnimatePresence || window.FramerMotion?.AnimatePresence || React.Fragment;
 
             const [deck, setDeck] = useState([...STRENGTHS]);
             const [currentCard, setCurrentCard] = useState(null);
             const [isFinished, setIsFinished] = useState(false);
-            const [count, setCount] = useState(0);
             const [isFlipping, setIsFlipping] = useState(false);
 
-            if (!motion) {
-                return <div className="flex items-center justify-center h-screen italic text-[#803080]">טוען את המגזין...</div>;
-            }
+            if (!motion) return null;
 
             const drawCard = () => {
                 if (isFlipping) return;
-                
                 setIsFlipping(true);
                 
                 setTimeout(() => {
@@ -85,11 +97,10 @@
                         setIsFinished(true);
                         setCurrentCard(null);
                     } else {
-                        const randomIndex = Math.floor(Math.random() * deck.length);
-                        const selectedCard = deck[randomIndex];
-                        setDeck(deck.filter((_, i) => i !== randomIndex));
+                        // לקיחת הכרטיס הראשון בערימה (סדר קבוע במקום אקראי)
+                        const selectedCard = deck[0];
+                        setDeck(deck.slice(1));
                         setCurrentCard(selectedCard);
-                        setCount(prev => prev + 1);
                     }
                     setIsFlipping(false);
                 }, 600);
@@ -99,48 +110,35 @@
                 setDeck([...STRENGTHS]);
                 setCurrentCard(null);
                 setIsFinished(false);
-                setCount(0);
             };
 
             return (
                 <div className="min-h-screen flex flex-col items-center p-4 md:p-8 bg-[#fdfaf6]">
-                    
-                    {/* כותרת המגזין */}
                     <header className="w-full max-w-lg mb-8 border-y-4 border-[#803080] py-6 text-center relative shadow-sm">
-                        <div className="absolute top-1 right-2 text-[9px] font-bold text-[#803080] opacity-50 uppercase">Issue No. 1</div>
-                        <div className="absolute top-1 left-2 text-[9px] font-bold text-[#803080] opacity-50 uppercase">Birthday 2026</div>
-                        
-                        <h1 className="serif-font text-7xl md:text-8xl font-black tracking-tighter text-[#803080] uppercase leading-none">
-                            לימור
+                        <h1 className="serif-font text-5xl md:text-6xl font-black tracking-tighter text-[#803080] uppercase leading-tight">
+                            לימור חוגגת יומולדת
                         </h1>
-                        
                         <div className="flex justify-between items-center mt-4 px-4 border-t border-[#803080]/20 pt-2 text-[#803080]">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">מפקחת כוללת בסטייל</span>
                             <span className="text-[10px] font-bold uppercase tracking-[0.2em]">מגזין החוזקות</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Birthday 2026</span>
                         </div>
                     </header>
 
-                    {/* אזור דפדוף תלת ממדי */}
-                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center relative perspective-container">
+                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center perspective-container relative">
                         <AnimatePresence mode="wait">
                             {isFinished ? (
                                 <motion.div
-                                    key="end-page"
+                                    key="end"
                                     initial={{ rotateY: 90, opacity: 0 }}
                                     animate={{ rotateY: 0, opacity: 1 }}
-                                    transition={{ duration: 0.8, ease: "easeOut" }}
-                                    className="magazine-card w-full bg-[#1a1a1a] shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[15px] border-[#803080] relative"
+                                    className="magazine-card w-full shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[15px] border-[#803080] bg-white"
                                 >
                                     <img 
                                         src={`${IMG_BASE}card8.png`} 
-                                        className="w-full h-full object-cover opacity-60"
-                                        onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=מזל+טוב+לימור"; }}
+                                        className="w-full h-full object-contain"
+                                        onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=מזל+טוב"; }}
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#803080] via-transparent to-transparent flex flex-col justify-end p-12 text-center text-white">
-                                        <h2 className="serif-font text-6xl mb-4 italic font-bold text-white">מזל טוב</h2>
-                                        <p className="text-xl tracking-widest font-light opacity-90 mb-8 italic text-white">הגליון הושלם באהבה</p>
-                                        <div className="h-1 w-20 bg-white/40 mx-auto"></div>
-                                    </div>
+                                    <div className="absolute inset-0 opacity-5 pointer-events-none paper-texture"></div>
                                 </motion.div>
                             ) : currentCard ? (
                                 <motion.div
@@ -148,96 +146,56 @@
                                     initial={{ rotateY: 90, opacity: 0 }}
                                     animate={{ rotateY: 0, opacity: 1 }}
                                     exit={{ rotateY: -90, opacity: 0 }}
-                                    transition={{ duration: 0.7, ease: "circOut" }}
-                                    className="magazine-card w-full bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[15px] border-stone-200 relative"
+                                    transition={{ duration: 0.7 }}
+                                    className="magazine-card w-full shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[15px] border-stone-200"
                                 >
-                                    <div className="absolute inset-0 opacity-10 pointer-events-none paper-texture mix-blend-multiply"></div>
-                                    
-                                    {/* תמונה */}
-                                    <div className="h-[70%] relative overflow-hidden">
-                                        <img 
-                                            src={`${IMG_BASE}${currentCard.img}`} 
-                                            className="w-full h-full object-cover contrast-[1.05]"
-                                            onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=Image+Loading..."; }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                                        <span className="absolute bottom-2 right-4 text-[130px] leading-none opacity-30 select-none serif-font italic text-white drop-shadow-2xl">
-                                            {currentCard.letter}
-                                        </span>
-                                        <div className="absolute top-4 left-4">
-                                            <div className="bg-[#803080] text-white px-3 py-1 text-[9px] font-black uppercase tracking-[0.3em] shadow-lg">
-                                                {currentCard.tag}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* טקסט */}
-                                    <div className="flex-1 px-8 py-6 flex flex-col text-right justify-between bg-white">
-                                        <div className="space-y-2">
-                                            <h2 className="serif-font text-4xl font-bold text-stone-900">{currentCard.title}</h2>
-                                            <p className="text-lg font-medium text-stone-600 leading-snug border-r-2 border-[#803080] pr-3">
-                                                {currentCard.desc}
-                                            </p>
-                                        </div>
-                                        <div className="mt-4 border-t border-stone-50 pt-3">
-                                            <p className="text-xl text-[#803080]/80 italic serif-font">
-                                                "{currentCard.quote}"
-                                            </p>
-                                        </div>
-                                        <div className="mt-2 text-[8px] font-bold text-stone-300 uppercase tracking-widest flex justify-between">
-                                            <span>עמוד {count} / 7</span>
-                                            <span>מהדורת לימור</span>
-                                        </div>
-                                    </div>
+                                    <img 
+                                        src={`${IMG_BASE}${currentCard.img}`} 
+                                        className="w-full h-full object-contain"
+                                        onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/f3f4f6/803080?text=Card+Not+Found"; }}
+                                    />
+                                    <div className="absolute inset-0 opacity-5 pointer-events-none paper-texture"></div>
                                 </motion.div>
                             ) : (
                                 <motion.div 
-                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                    className="text-center p-16 bg-white border border-stone-200 shadow-xl rounded-sm max-w-sm"
+                                    initial={{ opacity: 0, scale: 0.9 }} 
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="text-center p-10 md:p-16 bg-white border border-stone-200 shadow-xl rounded-sm w-full relative overflow-hidden"
                                 >
-                                    <div className="w-16 h-1 bg-[#803080] mx-auto mb-6"></div>
-                                    <h3 className="serif-font text-5xl italic text-[#803080] mb-4">גליון החוזקות</h3>
-                                    <p className="text-[10px] text-stone-400 uppercase tracking-[0.4em] font-bold mb-8 italic text-stone-500 italic">Limited Edition</p>
-                                    <p className="text-[9px] text-[#803080]/60 animate-pulse uppercase tracking-widest">לחצי למטה כדי להתחיל בדפדוף</p>
+                                    <BirthdayDecoration />
+                                    <div className="relative z-10">
+                                        <div className="w-16 h-1 bg-[#803080] mx-auto mb-6"></div>
+                                        <h3 className="serif-font text-5xl italic text-[#803080] mb-4 leading-tight drop-shadow-sm">מזל טוב ללימור שלנו</h3>
+                                        <div className="flex justify-center gap-4 my-8">
+                                            <span className="text-3xl">🥂</span>
+                                            <span className="text-3xl animate-bounce">🎈</span>
+                                            <span className="text-3xl">✨</span>
+                                        </div>
+                                        <p className="text-[10px] text-[#803080]/70 font-bold uppercase tracking-widest mt-4">מהדורה חגיגית מוגבלת</p>
+                                        <p className="text-[9px] text-[#803080]/40 animate-pulse uppercase tracking-[0.4em] mt-12 font-bold">לחצי למטה כדי להתחיל</p>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
                     </main>
 
-                    {/* בקרים */}
                     <footer className="w-full max-w-md mt-10 space-y-6">
                         {!isFinished && (
                             <button
                                 onClick={drawCard}
                                 disabled={isFlipping}
-                                className={`w-full text-white py-5 rounded-sm font-bold uppercase tracking-[0.4em] shadow-xl transition-all transform active:scale-95 text-xs border border-white/10 ${isFlipping ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
+                                className={`w-full text-white py-5 rounded-sm font-bold tracking-[0.3em] shadow-xl transition-all ${isFlipping ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
                             >
-                                {isFlipping ? "דפדוף..." : currentCard ? "להפוך דף במגזין" : "מזל טוב לימור שלנו"}
+                                {isFlipping ? "מדפדף..." : currentCard ? "להפוך דף" : "לפתיחת המגזין"}
                             </button>
                         )}
-
-                        <div className="flex justify-between items-center px-2 border-t border-[#803080]/10 pt-4">
-                            <div className="flex items-center gap-3">
-                                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest">דפים שנותרו:</span>
-                                <span className="text-lg font-black text-[#803080] leading-none">{deck.length}</span>
-                            </div>
-                            
-                            {(currentCard || isFinished) && (
-                                <button onClick={restart} className="text-[10px] font-bold text-[#803080]/50 underline underline-offset-8 hover:text-[#803080] transition-colors uppercase tracking-widest">
-                                    לקריאה חוזרת מהשער
+                        {(currentCard || isFinished) && (
+                            <div className="text-center">
+                                <button onClick={restart} className="text-[10px] font-bold text-[#803080]/50 underline uppercase tracking-widest">
+                                    חזרה לשער
                                 </button>
-                            )}
-                        </div>
-
-                        {/* ברקוד אסתטי */}
-                        <div className="flex flex-col items-center opacity-30 pt-4">
-                            <div className="h-8 flex gap-[1.5px]">
-                                {[...Array(18)].map((_, i) => (
-                                    <div key={i} className="bg-[#803080]" style={{ width: `${Math.random() * 3 + 1}px`, height: '100%' }}></div>
-                                ))}
                             </div>
-                            <span className="text-[7px] font-mono mt-1 text-[#803080]">LMR-MAGAZINE-2026</span>
-                        </div>
+                        )}
                     </footer>
                 </div>
             );
