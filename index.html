@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>מגזין לימור - מהדורת יום הולדת</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -17,7 +17,9 @@
             background-color: #f7f3f0; 
             color: #2d2d2d;
             margin: 0;
-            overflow-x: hidden;
+            overflow: hidden; /* מניעת גלילה כללית */
+            height: 100vh;
+            height: 100dvh;
         }
         .serif-font { font-family: 'Playfair Display', serif; }
         .perspective-container { perspective: 2000px; }
@@ -25,6 +27,8 @@
             aspect-ratio: 9 / 16; 
             transform-origin: right center;
             background-color: white;
+            max-height: 100%;
+            width: auto;
         }
         .paper-texture {
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
@@ -113,25 +117,25 @@
             };
 
             return (
-                <div className="min-h-screen flex flex-col items-center p-4 md:p-8 bg-[#fdfaf6]">
-                    <header className="w-full max-w-lg mb-8 border-y-4 border-[#803080] py-6 text-center relative shadow-sm">
-                        <h1 className="serif-font text-5xl md:text-6xl font-black tracking-tighter text-[#803080] uppercase leading-tight">
+                <div className="h-screen h-[100dvh] flex flex-col items-center p-2 md:p-6 bg-[#fdfaf6] overflow-hidden">
+                    <header className="w-full max-w-lg mb-2 md:mb-6 border-y-2 md:border-y-4 border-[#803080] py-2 md:py-4 text-center relative shadow-sm shrink-0">
+                        <h1 className="serif-font text-3xl md:text-6xl font-black tracking-tighter text-[#803080] uppercase leading-tight">
                             לימור חוגגת יומולדת
                         </h1>
-                        <div className="flex justify-between items-center mt-4 px-4 border-t border-[#803080]/20 pt-2 text-[#803080]">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">מגזין החוזקות</span>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Birthday 2026</span>
+                        <div className="flex justify-between items-center mt-2 px-4 border-t border-[#803080]/20 pt-1 text-[#803080]">
+                            <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em]">מגזין החוזקות</span>
+                            <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em]">Birthday 2026</span>
                         </div>
                     </header>
 
-                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center perspective-container relative">
+                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center perspective-container relative overflow-hidden">
                         <AnimatePresence mode="wait">
                             {isFinished ? (
                                 <motion.div
                                     key="end"
                                     initial={{ rotateY: 90, opacity: 0 }}
                                     animate={{ rotateY: 0, opacity: 1 }}
-                                    className="magazine-card w-full shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[15px] border-[#803080] bg-white"
+                                    className="magazine-card h-full max-h-[70vh] shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[10px] md:border-r-[15px] border-[#803080] bg-white"
                                 >
                                     <img 
                                         src={`${IMG_BASE}card8.png`} 
@@ -147,7 +151,7 @@
                                     animate={{ rotateY: 0, opacity: 1 }}
                                     exit={{ rotateY: -90, opacity: 0 }}
                                     transition={{ duration: 0.7 }}
-                                    className="magazine-card w-full shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[15px] border-stone-200"
+                                    className="magazine-card h-full max-h-[70vh] shadow-2xl rounded-sm overflow-hidden flex flex-col border-r-[10px] md:border-r-[15px] border-stone-200"
                                 >
                                     <img 
                                         src={`${IMG_BASE}${currentCard.img}`} 
@@ -160,31 +164,31 @@
                                 <motion.div 
                                     initial={{ opacity: 0, scale: 0.9 }} 
                                     animate={{ opacity: 1, scale: 1 }}
-                                    className="text-center p-10 md:p-16 bg-white border border-stone-200 shadow-xl rounded-sm w-full relative overflow-hidden"
+                                    className="text-center p-6 md:p-16 bg-white border border-stone-200 shadow-xl rounded-sm w-full relative overflow-hidden"
                                 >
                                     <BirthdayDecoration />
                                     <div className="relative z-10">
-                                        <div className="w-16 h-1 bg-[#803080] mx-auto mb-6"></div>
-                                        <h3 className="serif-font text-5xl italic text-[#803080] mb-4 leading-tight drop-shadow-sm">מזל טוב ללימור שלנו</h3>
-                                        <div className="flex justify-center gap-4 my-8">
-                                            <span className="text-3xl">🥂</span>
-                                            <span className="text-3xl animate-bounce">🎈</span>
-                                            <span className="text-3xl">✨</span>
+                                        <div className="w-12 h-1 bg-[#803080] mx-auto mb-4"></div>
+                                        <h3 className="serif-font text-3xl md:text-5xl italic text-[#803080] mb-2 leading-tight drop-shadow-sm">מזל טוב ללימור שלנו</h3>
+                                        <div className="flex justify-center gap-4 my-4 md:my-8">
+                                            <span className="text-2xl md:text-3xl">🥂</span>
+                                            <span className="text-2xl md:text-3xl animate-bounce">🎈</span>
+                                            <span className="text-2xl md:text-3xl">✨</span>
                                         </div>
-                                        <p className="text-[10px] text-[#803080]/70 font-bold uppercase tracking-widest mt-4">מהדורה חגיגית מוגבלת</p>
-                                        <p className="text-[9px] text-[#803080]/40 animate-pulse uppercase tracking-[0.4em] mt-12 font-bold">לחצי למטה כדי להתחיל</p>
+                                        <p className="text-[8px] md:text-[10px] text-[#803080]/70 font-bold uppercase tracking-widest mt-2">מהדורה חגיגית מוגבלת</p>
+                                        <p className="text-[8px] md:text-[9px] text-[#803080]/40 animate-pulse uppercase tracking-[0.4em] mt-6 md:mt-12 font-bold">לחצי למטה כדי להתחיל</p>
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
                     </main>
 
-                    <footer className="w-full max-w-md mt-10 space-y-6">
+                    <footer className="w-full max-w-md mt-4 md:mt-10 mb-2 space-y-2 md:space-y-6 shrink-0">
                         {!isFinished && (
                             <button
                                 onClick={drawCard}
                                 disabled={isFlipping}
-                                className={`w-full text-white py-5 rounded-sm font-bold tracking-[0.3em] shadow-xl transition-all ${isFlipping ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
+                                className={`w-full text-white py-3 md:py-5 rounded-sm font-bold tracking-[0.3em] shadow-xl transition-all ${isFlipping ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
                             >
                                 {isFlipping ? "מדפדף..." : currentCard ? "להפוך דף" : "לפתיחת המגזין"}
                             </button>
