@@ -11,15 +11,19 @@
     <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
-        :root { --magazine-purple: #803080; }
+        :root { 
+            --magazine-purple: #803080; 
+            /* הגוון המדויק שנדגם מהתמונה שלך - שמנת חמה ורכה */
+            --card-background: #fdfaf8; 
+            --app-background: #f8f4f1;
+        }
         body { 
             font-family: 'Assistant', sans-serif; 
-            background-color: #f7f3f0; 
+            background-color: var(--app-background); 
             color: #2d2d2d;
             margin: 0;
             padding: 0;
             overflow: hidden; 
-            /* שימוש ב-dvh להתאמה מושלמת לסרגלי הכלים של אנדרואיד */
             height: 100vh;
             height: 100dvh;
         }
@@ -36,22 +40,34 @@
 
         .magazine-card { 
             aspect-ratio: 9 / 16; 
-            background-color: white;
-            /* מבטיח שהכרטיסייה לעולם לא תצא מגבולות המסך */
+            background-color: var(--card-background);
             max-height: 100%;
             width: auto;
             position: absolute;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 30px rgba(128, 48, 128, 0.08);
             border-radius: 4px;
             overflow: hidden;
+            /* גבול דק וכמעט שקוף למניעת חיתוך ויזואלי */
+            border: 1px solid rgba(128, 48, 128, 0.03);
         }
 
         .paper-texture {
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
-            opacity: 0.05;
+            opacity: 0.04;
             position: absolute;
             inset: 0;
             pointer-events: none;
+        }
+
+        /* שדרה דקורטיבית עדינה מאוד שנותנת תחושת דף */
+        .card-spine {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(to left, rgba(0,0,0,0.03), transparent);
+            z-index: 5;
         }
     </style>
 </head>
@@ -65,16 +81,15 @@
         const GITHUB_REPO = "L-"; 
         const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/`;
 
-        // רשימת התמונות המעודכנת - מ-card0 עד card7
         const ALL_IMAGES = [
-            "card0.png", // שער
+            "card0.png",
             "card1.png",
             "card2.png",
             "card3.png",
             "card4.png",
             "card5.png",
             "card6.png",
-            "card7.png"  // סיום
+            "card7.png"
         ];
 
         function App() {
@@ -98,17 +113,17 @@
             };
 
             return (
-                <div className="h-screen h-[100dvh] flex flex-col items-center p-0 bg-[#f7f3f0] overflow-hidden text-center">
+                <div className="h-screen h-[100dvh] flex flex-col items-center p-0 bg-[var(--app-background)] overflow-hidden text-center">
                     
-                    {/* כותרת עליונה - קומפקטית */}
-                    <header className="w-full max-w-lg mt-2 border-y border-[#803080] py-1 md:py-2 relative shrink-0">
+                    {/* כותרת עליונה - דקה ואלגנטית */}
+                    <header className="w-full max-w-lg mt-2 border-y border-[#803080]/30 py-2 relative shrink-0">
                         <h1 className="serif-font text-xl md:text-3xl font-black text-[#803080] uppercase tracking-tight">
                             לימור חוגגת יומולדת
                         </h1>
                     </header>
 
-                    {/* אזור הדפדוף - גמיש (min-h-0 חשוב כדי לאפשר לכלי להתכווץ) */}
-                    <main className="flex-1 min-h-0 w-full max-w-md flex flex-col items-center justify-center relative overflow-hidden py-2 md:py-4 px-6">
+                    {/* אזור הערמה - מותאם למסך אנדרואיד */}
+                    <main className="flex-1 min-h-0 w-full max-w-md flex flex-col items-center justify-center relative overflow-hidden py-3 px-6">
                         <div className="stack-container">
                             <AnimatePresence>
                                 {ALL_IMAGES.map((img, index) => {
@@ -119,22 +134,23 @@
                                             key={img}
                                             initial={{ scale: 0.9, opacity: 0 }}
                                             animate={{ 
-                                                scale: index === currentIndex ? 1 : 0.95,
+                                                scale: index === currentIndex ? 1 : 0.96,
                                                 opacity: 1,
                                                 zIndex: ALL_IMAGES.length - index
                                             }}
                                             exit={{ 
                                                 x: -500, 
-                                                rotate: -15, 
+                                                rotate: -12, 
                                                 opacity: 0,
-                                                transition: { duration: 0.6, ease: "circIn" }
+                                                transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
                                             }}
                                             className="magazine-card"
                                         >
+                                            <div className="card-spine"></div>
                                             <img 
                                                 src={`${IMG_BASE}${img}`} 
                                                 className="w-full h-full object-contain"
-                                                onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=LIMOR"; }}
+                                                onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/fdfaf8/803080?text=LIMOR"; }}
                                             />
                                             <div className="paper-texture"></div>
                                         </motion.div>
@@ -144,22 +160,22 @@
                         </div>
                     </main>
 
-                    {/* כפתורים תחתונים - תמיד גלויים (shrink-0) */}
-                    <footer className="w-full max-w-xs mb-4 md:mb-6 space-y-2 shrink-0 px-4">
+                    {/* כפתורים תחתונים - קומפקטיים למניעת חיתוך */}
+                    <footer className="w-full max-w-xs mb-4 md:mb-8 space-y-2 shrink-0 px-4">
                         {currentIndex < ALL_IMAGES.length - 1 ? (
                             <button
                                 onClick={nextStep}
                                 disabled={isAnimating}
-                                className={`w-full text-white py-3 rounded-sm font-bold tracking-widest shadow-lg transition-all text-xs md:text-sm active:scale-95 ${isAnimating ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
+                                className={`w-full text-white py-3 rounded-sm font-bold tracking-[0.2em] shadow-lg transition-all text-xs md:text-sm active:scale-95 ${isAnimating ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
                             >
                                 {currentIndex === 0 ? "לפתיחת המגזין" : "להפוך דף"}
                             </button>
                         ) : (
                             <div className="flex flex-col items-center gap-2">
-                                <span className="text-[#803080] font-bold text-[10px] uppercase tracking-tighter opacity-60">סוף הגיליון</span>
+                                <span className="text-[#803080] font-bold text-[10px] uppercase tracking-tighter opacity-40">סיום הגיליון</span>
                                 <button 
                                     onClick={restart} 
-                                    className="w-auto text-[12px] md:text-sm font-bold text-white bg-[#803080] py-2.5 px-10 rounded-full shadow-md uppercase tracking-widest hover:bg-[#6a276a] transition-all transform active:scale-95 border border-white/20"
+                                    className="w-auto text-[12px] md:text-sm font-black text-white bg-[#803080] py-3 px-12 rounded-full shadow-xl uppercase tracking-widest hover:bg-[#6a276a] transition-all transform active:scale-95 border-2 border-white/20"
                                 >
                                     חזרה לשער
                                 </button>
@@ -169,7 +185,7 @@
                         {currentIndex > 0 && currentIndex < ALL_IMAGES.length - 1 && (
                             <button 
                                 onClick={restart} 
-                                className="text-[10px] text-stone-400 uppercase tracking-tighter hover:text-[#803080] transition-colors py-1"
+                                className="text-[10px] text-stone-400 font-bold uppercase tracking-tighter hover:text-[#803080] transition-colors py-1"
                             >
                                 התחלה מחדש
                             </button>
