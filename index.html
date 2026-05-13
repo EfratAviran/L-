@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>מגזין לימור - מהדורת יום הולדת</title>
+    <title>מגזין לימור - מהדורת קלפי חוזקה</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -23,24 +23,34 @@
             height: 100dvh;
         }
         .serif-font { font-family: 'Playfair Display', serif; }
-        .perspective-container { perspective: 2000px; }
+        
+        /* מיכל הקלפים - מבנה ערמה */
+        .stack-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .magazine-card { 
             aspect-ratio: 9 / 16; 
-            transform-origin: right center;
             background-color: white;
             max-height: 100%;
             width: auto;
+            position: absolute;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
         }
+
         .paper-texture {
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
-        }
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(5deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-        .floating-icon {
-            animation: float 4s ease-in-out infinite;
+            opacity: 0.05;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -50,159 +60,119 @@
     <script type="text/babel">
         const { useState } = React;
 
-        // הגדרות GitHub של אפרת
         const GITHUB_USER = "EfratAviran"; 
         const GITHUB_REPO = "L-"; 
         const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/`;
 
-        // רשימת כרטיסיות לפי סדר (card1 עד card7)
-        const STRENGTHS = [
-            { id: 1, img: "card1.png" },
-            { id: 2, img: "card2.png" },
-            { id: 3, img: "card3.png" },
-            { id: 4, img: "card4.png" },
-            { id: 5, img: "card5.png" },
-            { id: 6, img: "card6.png" },
-            { id: 7, img: "card7.png" } 
+        // רשימת התמונות בסדר קבוע
+        const ALL_IMAGES = [
+            "card0.png", // שער
+            "card1.png",
+            "card2.png",
+            "card3.png",
+            "card4.png",
+            "card5.png",
+            "card6.png",
+            "card7.png"  // סיום
         ];
-
-        // קישוטים עדינים לשער
-        const BirthdayDecoration = () => (
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
-                <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-[#803080] rounded-full animate-ping"></div>
-                <div className="absolute bottom-1/3 right-10 w-4 h-4 border-2 border-[#803080] rotate-45 animate-bounce"></div>
-                <svg className="absolute top-10 right-10 w-12 h-12 floating-icon opacity-40" viewBox="0 0 24 24" fill="none" stroke="#803080" strokeWidth="1">
-                    <circle cx="12" cy="12" r="10" />
-                </svg>
-            </div>
-        );
 
         function App() {
             const motion = window.Motion?.motion || window.FramerMotion?.motion || null;
             const AnimatePresence = window.Motion?.AnimatePresence || window.FramerMotion?.AnimatePresence || React.Fragment;
 
-            const [deck, setDeck] = useState([...STRENGTHS]);
-            const [currentCard, setCurrentCard] = useState(null);
-            const [isFinished, setIsFinished] = useState(false);
-            const [isFlipping, setIsFlipping] = useState(false);
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
 
             if (!motion) return null;
 
-            // מעבר לדף הבא בסדר קבוע
-            const drawCard = () => {
-                if (isFlipping) return;
-                setIsFlipping(true);
-                
-                setTimeout(() => {
-                    if (deck.length === 0) {
-                        setIsFinished(true);
-                        setCurrentCard(null);
-                    } else {
-                        const selectedCard = deck[0];
-                        setDeck(deck.slice(1));
-                        setCurrentCard(selectedCard);
-                    }
-                    setIsFlipping(false);
-                }, 600);
+            const nextStep = () => {
+                if (isAnimating || currentIndex >= ALL_IMAGES.length - 1) return;
+                setIsAnimating(true);
+                setCurrentIndex(prev => prev + 1);
+                setTimeout(() => setIsAnimating(false), 600);
             };
 
-            // איפוס וחזרה לשער
             const restart = () => {
-                setDeck([...STRENGTHS]);
-                setCurrentCard(null);
-                setIsFinished(false);
+                setCurrentIndex(0);
             };
 
             return (
-                <div className="h-screen h-[100dvh] flex flex-col items-center p-1 md:p-6 bg-[#fdfaf6] overflow-hidden text-center">
+                <div className="h-screen h-[100dvh] flex flex-col items-center p-0 bg-[#f7f3f0] overflow-hidden text-center">
                     
-                    {/* כותרת עליונה - מצומצמת למקסימום מקום לתמונה */}
-                    <header className="w-full max-w-lg mb-1 md:mb-4 border-y md:border-y-4 border-[#803080] py-1 md:py-2 relative shrink-0">
-                        <h1 className="serif-font text-xl md:text-5xl font-black tracking-tighter text-[#803080] uppercase leading-tight">
+                    {/* כותרת מוקטנת ואלגנטית */}
+                    <header className="w-full max-w-lg mt-2 border-y border-[#803080] py-1.5 relative shrink-0">
+                        <h1 className="serif-font text-lg md:text-3xl font-black text-[#803080] uppercase tracking-tight">
                             לימור חוגגת יומולדת
                         </h1>
-                        <div className="flex justify-between items-center mt-1 px-4 border-t border-[#803080]/10 pt-0.5 text-[#803080]">
-                            <span className="text-[7px] md:text-[10px] font-bold uppercase tracking-[0.2em]">מגזין החוזקות</span>
-                            <span className="text-[7px] md:text-[10px] font-bold uppercase tracking-[0.2em]">Birthday 2026</span>
-                        </div>
                     </header>
 
-                    {/* אזור הדפדוף - מוגדל ל-80% מהגובה */}
-                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center perspective-container relative overflow-hidden">
-                        <AnimatePresence mode="wait">
-                            {isFinished ? (
-                                /* דף סיום - card8 */
-                                <motion.div
-                                    key="end"
-                                    initial={{ rotateY: 90, opacity: 0 }}
-                                    animate={{ rotateY: 0, opacity: 1 }}
-                                    className="magazine-card h-full max-h-[80vh] shadow-xl rounded-sm overflow-hidden flex flex-col border-r-[8px] md:border-r-[15px] border-[#803080] bg-white relative"
-                                >
-                                    <img 
-                                        src={`${IMG_BASE}card8.png`} 
-                                        className="w-full h-full object-contain"
-                                        onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=מזל+טוב"; }}
-                                    />
-                                    <div className="absolute inset-0 opacity-5 pointer-events-none paper-texture"></div>
-                                </motion.div>
-                            ) : currentCard ? (
-                                /* דפי התוכן - card1 עד card7 */
-                                <motion.div
-                                    key={currentCard.id}
-                                    initial={{ rotateY: 90, opacity: 0 }}
-                                    animate={{ rotateY: 0, opacity: 1 }}
-                                    exit={{ rotateY: -90, opacity: 0 }}
-                                    transition={{ duration: 0.7 }}
-                                    className="magazine-card h-full max-h-[80vh] shadow-xl rounded-sm overflow-hidden flex flex-col border-r-[8px] md:border-r-[15px] border-stone-200 bg-white"
-                                >
-                                    <img 
-                                        src={`${IMG_BASE}${currentCard.img}`} 
-                                        className="w-full h-full object-contain"
-                                        onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/f3f4f6/803080?text=Card+Not+Found"; }}
-                                    />
-                                    <div className="absolute inset-0 opacity-5 pointer-events-none paper-texture"></div>
-                                </motion.div>
-                            ) : (
-                                /* דף שער - כעת מציג את card0.png ככרטיסייה מלאה */
-                                <motion.div 
-                                    key="cover"
-                                    initial={{ opacity: 0 }} 
-                                    animate={{ opacity: 1 }}
-                                    className="magazine-card h-full max-h-[80vh] shadow-xl rounded-sm overflow-hidden flex flex-col border-r-[8px] md:border-r-[15px] border-[#803080] bg-white relative"
-                                >
-                                    <img 
-                                        src={`${IMG_BASE}card0.png`} 
-                                        className="w-full h-full object-contain"
-                                        onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=שער+המגזין"; }}
-                                    />
-                                    <div className="absolute inset-0 opacity-5 pointer-events-none paper-texture"></div>
-                                    <BirthdayDecoration />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                    {/* אזור הערמה - Stack reveal */}
+                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center relative overflow-hidden py-4 px-6">
+                        <div className="stack-container">
+                            <AnimatePresence>
+                                {ALL_IMAGES.map((img, index) => {
+                                    // מציגים רק את התמונה הנוכחית ואת זו שמתחתיה
+                                    if (index < currentIndex || index > currentIndex + 1) return null;
+
+                                    return (
+                                        <motion.div
+                                            key={img}
+                                            initial={{ scale: 0.9, opacity: 0 }}
+                                            animate={{ 
+                                                scale: index === currentIndex ? 1 : 0.95,
+                                                opacity: 1,
+                                                zIndex: ALL_IMAGES.length - index
+                                            }}
+                                            exit={{ 
+                                                x: -500, 
+                                                rotate: -15, 
+                                                opacity: 0,
+                                                transition: { duration: 0.6, ease: "circIn" }
+                                            }}
+                                            className="magazine-card"
+                                        >
+                                            <img 
+                                                src={`${IMG_BASE}${img}`} 
+                                                className="w-full h-full object-contain"
+                                                onError={(e) => { e.target.src = "https://via.placeholder.com/800x1400/803080/ffffff?text=LIMOR"; }}
+                                            />
+                                            <div className="paper-texture"></div>
+                                        </motion.div>
+                                    );
+                                }).reverse()}
+                            </AnimatePresence>
+                        </div>
                     </main>
 
-                    {/* כפתורים תחתונים - קומפקטיים למקסום מקום לתמונה */}
-                    <footer className="w-full max-w-md mt-1 md:mt-4 mb-2 space-y-2 shrink-0 px-6">
-                        {!isFinished && (
+                    {/* כפתורי שליטה */}
+                    <footer className="w-full max-w-xs mb-4 space-y-2 shrink-0 px-4">
+                        {currentIndex < ALL_IMAGES.length - 1 ? (
                             <button
-                                onClick={drawCard}
-                                disabled={isFlipping}
-                                className={`w-full text-white py-2 md:py-3 rounded-sm font-bold tracking-[0.1em] shadow-lg transition-all text-[11px] md:text-sm ${isFlipping ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
+                                onClick={nextStep}
+                                disabled={isAnimating}
+                                className={`w-full text-white py-2.5 rounded-sm font-bold tracking-widest shadow-lg transition-all text-xs md:text-sm active:scale-95 ${isAnimating ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
                             >
-                                {isFlipping ? "מדפדף..." : currentCard ? "להפוך דף" : "לפתיחת המגזין"}
+                                {currentIndex === 0 ? "לפתיחת המגזין" : "להפוך דף"}
                             </button>
-                        )}
-                        
-                        {(currentCard || isFinished) && (
-                            <div className="flex justify-center pt-1">
+                        ) : (
+                            <div className="flex flex-col items-center gap-3">
+                                <span className="text-[#803080] font-bold text-xs">סוף הגיליון</span>
                                 <button 
                                     onClick={restart} 
-                                    className="w-full max-w-[280px] text-[13px] md:text-[16px] font-black text-white bg-[#803080] py-2 md:py-3 px-6 rounded-full shadow-xl uppercase tracking-widest hover:bg-[#6a276a] transition-all transform active:scale-95 border-2 border-white/20"
+                                    className="w-auto text-[11px] md:text-xs font-bold text-white bg-[#803080] py-2 px-8 rounded-full shadow-md uppercase tracking-widest hover:bg-[#6a276a] transition-all transform active:scale-95 border border-white/20"
                                 >
-                                    חזרה לשער המגזין
+                                    חזרה לשער
                                 </button>
                             </div>
+                        )}
+                        
+                        {currentIndex > 0 && currentIndex < ALL_IMAGES.length - 1 && (
+                            <button 
+                                onClick={restart} 
+                                className="text-[10px] text-stone-400 uppercase tracking-tighter hover:text-[#803080] transition-colors"
+                            >
+                                התחלה מחדש
+                            </button>
                         )}
                     </footer>
                 </div>
