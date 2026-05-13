@@ -19,12 +19,12 @@
             margin: 0;
             padding: 0;
             overflow: hidden; 
+            /* שימוש ב-dvh להתאמה מושלמת לסרגלי הכלים של אנדרואיד */
             height: 100vh;
             height: 100dvh;
         }
         .serif-font { font-family: 'Playfair Display', serif; }
         
-        /* מיכל הקלפים - מבנה ערמה */
         .stack-container {
             position: relative;
             width: 100%;
@@ -37,6 +37,7 @@
         .magazine-card { 
             aspect-ratio: 9 / 16; 
             background-color: white;
+            /* מבטיח שהכרטיסייה לעולם לא תצא מגבולות המסך */
             max-height: 100%;
             width: auto;
             position: absolute;
@@ -64,7 +65,7 @@
         const GITHUB_REPO = "L-"; 
         const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/`;
 
-        // רשימת התמונות בסדר קבוע
+        // רשימת התמונות המעודכנת - מ-card0 עד card7
         const ALL_IMAGES = [
             "card0.png", // שער
             "card1.png",
@@ -99,19 +100,18 @@
             return (
                 <div className="h-screen h-[100dvh] flex flex-col items-center p-0 bg-[#f7f3f0] overflow-hidden text-center">
                     
-                    {/* כותרת מוקטנת ואלגנטית */}
-                    <header className="w-full max-w-lg mt-2 border-y border-[#803080] py-1.5 relative shrink-0">
-                        <h1 className="serif-font text-lg md:text-3xl font-black text-[#803080] uppercase tracking-tight">
+                    {/* כותרת עליונה - קומפקטית */}
+                    <header className="w-full max-w-lg mt-2 border-y border-[#803080] py-1 md:py-2 relative shrink-0">
+                        <h1 className="serif-font text-xl md:text-3xl font-black text-[#803080] uppercase tracking-tight">
                             לימור חוגגת יומולדת
                         </h1>
                     </header>
 
-                    {/* אזור הערמה - Stack reveal */}
-                    <main className="flex-1 w-full max-w-md flex flex-col items-center justify-center relative overflow-hidden py-4 px-6">
+                    {/* אזור הדפדוף - גמיש (min-h-0 חשוב כדי לאפשר לכלי להתכווץ) */}
+                    <main className="flex-1 min-h-0 w-full max-w-md flex flex-col items-center justify-center relative overflow-hidden py-2 md:py-4 px-6">
                         <div className="stack-container">
                             <AnimatePresence>
                                 {ALL_IMAGES.map((img, index) => {
-                                    // מציגים רק את התמונה הנוכחית ואת זו שמתחתיה
                                     if (index < currentIndex || index > currentIndex + 1) return null;
 
                                     return (
@@ -144,22 +144,22 @@
                         </div>
                     </main>
 
-                    {/* כפתורי שליטה */}
-                    <footer className="w-full max-w-xs mb-4 space-y-2 shrink-0 px-4">
+                    {/* כפתורים תחתונים - תמיד גלויים (shrink-0) */}
+                    <footer className="w-full max-w-xs mb-4 md:mb-6 space-y-2 shrink-0 px-4">
                         {currentIndex < ALL_IMAGES.length - 1 ? (
                             <button
                                 onClick={nextStep}
                                 disabled={isAnimating}
-                                className={`w-full text-white py-2.5 rounded-sm font-bold tracking-widest shadow-lg transition-all text-xs md:text-sm active:scale-95 ${isAnimating ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
+                                className={`w-full text-white py-3 rounded-sm font-bold tracking-widest shadow-lg transition-all text-xs md:text-sm active:scale-95 ${isAnimating ? 'bg-stone-400' : 'bg-[#803080] hover:bg-[#6a276a]'}`}
                             >
                                 {currentIndex === 0 ? "לפתיחת המגזין" : "להפוך דף"}
                             </button>
                         ) : (
-                            <div className="flex flex-col items-center gap-3">
-                                <span className="text-[#803080] font-bold text-xs">סוף הגיליון</span>
+                            <div className="flex flex-col items-center gap-2">
+                                <span className="text-[#803080] font-bold text-[10px] uppercase tracking-tighter opacity-60">סוף הגיליון</span>
                                 <button 
                                     onClick={restart} 
-                                    className="w-auto text-[11px] md:text-xs font-bold text-white bg-[#803080] py-2 px-8 rounded-full shadow-md uppercase tracking-widest hover:bg-[#6a276a] transition-all transform active:scale-95 border border-white/20"
+                                    className="w-auto text-[12px] md:text-sm font-bold text-white bg-[#803080] py-2.5 px-10 rounded-full shadow-md uppercase tracking-widest hover:bg-[#6a276a] transition-all transform active:scale-95 border border-white/20"
                                 >
                                     חזרה לשער
                                 </button>
@@ -169,7 +169,7 @@
                         {currentIndex > 0 && currentIndex < ALL_IMAGES.length - 1 && (
                             <button 
                                 onClick={restart} 
-                                className="text-[10px] text-stone-400 uppercase tracking-tighter hover:text-[#803080] transition-colors"
+                                className="text-[10px] text-stone-400 uppercase tracking-tighter hover:text-[#803080] transition-colors py-1"
                             >
                                 התחלה מחדש
                             </button>
